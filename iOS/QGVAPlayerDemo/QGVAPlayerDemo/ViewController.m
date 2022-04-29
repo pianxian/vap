@@ -86,7 +86,7 @@ void qg_VAP_Logger_handler(VAPLogLevel level, const char* file, int line, const 
     mp4View.hwd_enterBackgroundOP = HWDMP4EBOperationTypeStop;
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onImageviewTap:)];
     [mp4View addGestureRecognizer:tap];
-    NSString *resPath = [NSString stringWithFormat:@"%@/Resource/demo.mp4", [[NSBundle mainBundle] resourcePath]];
+    NSString *resPath = [NSString stringWithFormat:@"%@/Resource/giftId-601d204db3633b319c465457.mp4", [[NSBundle mainBundle] resourcePath]];
     //单纯播放的接口
     //[mp4View playHWDMp4:resPath];
     //指定素材混合模式，重复播放次数，delegate的接口
@@ -121,7 +121,7 @@ void qg_VAP_Logger_handler(VAPLogLevel level, const char* file, int line, const 
     wrapView.contentMode = QGVAPWrapViewContentModeAspectFit;
     wrapView.autoDestoryAfterFinish = YES;
     [self.view addSubview:wrapView];
-    NSString *resPath = [NSString stringWithFormat:@"%@/Resource/demo.mp4", [[NSBundle mainBundle] resourcePath]];
+    NSString *resPath = [NSString stringWithFormat:@"%@/Resource/giftId-601d204db3633b319c465457.mp4", [[NSBundle mainBundle] resourcePath]];
     [wrapView playHWDMP4:resPath repeatCount:-1 delegate:self];
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doNothingonImageviewTap:)];
     
