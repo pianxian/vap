@@ -5,9 +5,7 @@
 #  To learn more about Podspec attributes see https://docs.cocoapods.org/specification.html
 #  To see working Podspecs in the CocoaPods repo see https://github.com/CocoaPods/Specs/
 #
-    spec.resource_bundles = {
-      'Metal' => ['iOS/QGVAPlayer/QGVAPlayer/**/*.metallib']
-    }
+
 
 Pod::Spec.new do |spec|
 
@@ -100,7 +98,9 @@ Pod::Spec.new do |spec|
   #
 
 
-
+    spec.resource_bundles = {
+      'Metal' => ['iOS/QGVAPlayer/QGVAPlayer/**/*.metallib']
+    }
   build_metal_script = <<-CMD
       #Pods目录
       podsPath='iOS/QGVAPlayer/QGVAPlayer/Shaders'
