@@ -5,6 +5,9 @@
 #  To learn more about Podspec attributes see https://docs.cocoapods.org/specification.html
 #  To see working Podspecs in the CocoaPods repo see https://github.com/CocoaPods/Specs/
 #
+    spec.resource_bundles = {
+      'Metal' => ['iOS/QGVAPlayer/QGVAPlayer/**/*.metallib']
+    }
 
 Pod::Spec.new do |spec|
 
@@ -16,7 +19,7 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "QGVAPlayer"
-  spec.version      = "1.0.19"
+  spec.version      = "1.0.20"
   spec.summary      = "video animation player."
   spec.platform     = :ios, "8.0"
 
@@ -95,14 +98,8 @@ Pod::Spec.new do |spec|
   #  For header files it will include any header in the folder.
   #  Not including the public_header_files will make all headers public.
   #
-    spec.resource_bundles = {
-      'Metal' => ['iOS/QGVAPlayer/QGVAPlayer/**/*.metallib']
-    }
 
-   # spec.subspec "MetalKit" do |sp|
-    #  sp.source_files = "CCAlphaVideoPlayer/MetalKit/**/*.{h,m,mm,c}"
-   #   sp.resources = "CCAlphaVideoPlayer/MetalKit/**/*.{metal,sh}"
-   # end
+
 
   build_metal_script = <<-CMD
       #Pods目录
@@ -114,8 +111,11 @@ Pod::Spec.new do |spec|
   CMD
 spec.script_phase = { :name => 'Build Metal', :script => build_metal_script, :shell_path =>'/bin/sh', :execution_position => :before_compile}
 
-  spec.source_files = 'iOS/QGVAPlayer/QGVAPlayer/**/*.{h,m}', 'iOS/QGVAPlayer/QGVAPlayer/Shaders/QGHWDShaders.metal','iOS/QGVAPlayer/QGVAPlayer/Shaders/compile_metal.sh'
+  spec.source_files = 'iOS/QGVAPlayer/QGVAPlayer/**/*.{h,m}'
+#'iOS/QGVAPlayer/QGVAPlayer/Shaders/QGHWDShaders.metal'
 
+  spec.resources = 'iOS/QGVAPlayer/QGVAPlayer/**/*.{metal,sh}'
+  
   # spec.subspec 'Shaders' do |ss|
   #   ss.source_files = 'iOS/QGVAPlayer/QGVAPlayer/Shaders/**/*.{h,m}'
   # end

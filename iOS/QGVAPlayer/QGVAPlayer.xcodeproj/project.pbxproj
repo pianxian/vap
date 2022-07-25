@@ -62,7 +62,6 @@
 		6307243A22F0410600B15629 /* QGHWDMP4OpenGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6307240022F0410600B15629 /* QGHWDMP4OpenGLView.m */; };
 		6307243B22F0410600B15629 /* QGHWDMP4OpenGLView.h in Headers */ = {isa = PBXBuildFile; fileRef = 6307240122F0410600B15629 /* QGHWDMP4OpenGLView.h */; };
 		6307243C22F0410600B15629 /* VAPMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 6307240222F0410600B15629 /* VAPMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		6307243F22F0410600B15629 /* QGHWDShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 6307240622F0410600B15629 /* QGHWDShaders.metal */; };
 		632942D9231BED7D00B511BB /* QGVAPMetalUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 632942D7231BED7D00B511BB /* QGVAPMetalUtil.h */; };
 		632942DA231BED7D00B511BB /* QGVAPMetalUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 632942D8231BED7D00B511BB /* QGVAPMetalUtil.m */; };
 		636FE34823604B570001565D /* UIView+MP4HWDecode.h in Headers */ = {isa = PBXBuildFile; fileRef = 636FE34623604B570001565D /* UIView+MP4HWDecode.h */; };
@@ -490,6 +489,7 @@
 				630723A222F0409200B15629 /* Headers */,
 				630723A322F0409200B15629 /* Sources */,
 				630723A422F0409200B15629 /* Frameworks */,
+				3277374A288EAEDE005AEA92 /* Build Metal */,
 				630723A522F0409200B15629 /* Resources */,
 			);
 			buildRules = (
@@ -571,12 +571,32 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		3277374A288EAEDE005AEA92 /* Build Metal */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Build Metal";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		630723A322F0409200B15629 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6307243F22F0410600B15629 /* QGHWDShaders.metal in Sources */,
 				6307242A22F0410600B15629 /* QGAnimatedImageDecodeThreadPool.m in Sources */,
 				63AFC6B8231E3D4A00E127F9 /* QGVAPMetalShaderFunctionLoader.m in Sources */,
 				6307243A22F0410600B15629 /* QGHWDMP4OpenGLView.m in Sources */,
