@@ -17,6 +17,8 @@
 #import "UIView+VAP.h"
 #import "QGVAPWrapView.h"
 
+#import <AVFoundation/AVFoundation.h>
+
 @interface ViewController () <HWDMP4PlayDelegate, VAPWrapViewDelegate>
 
 @property (nonatomic, strong) UIButton *vapButton;
@@ -48,6 +50,7 @@ void qg_VAP_Logger_handler(VAPLogLevel level, const char* file, int line, const 
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self setupAudioSession];
     
     //日志
     [UIView registerHWDLog:qg_VAP_Logger_handler];
@@ -74,6 +77,18 @@ void qg_VAP_Logger_handler(VAPLogLevel level, const char* file, int line, const 
     [self.view addSubview:_vapWrapViewButton];
 }
 
+- (void)setupAudioSession {
+    AVAudioSession* avsession = [AVAudioSession sharedInstance];
+    NSError *error = nil;
+    if (![avsession setCategory:AVAudioSessionCategoryPlayback withOptions:0 error:&error]) {
+        if (error) NSLog(@"AVAudioSession setCategory failed : %ld, %s", (long)error.code, [error.localizedDescription UTF8String]);
+        return;
+    }
+    if (![avsession setActive:YES error:&error]) {
+        if (error) NSLog(@"AVAudioSession setActive failed : %ld, %s", (long)error.code, [error.localizedDescription UTF8String]);
+    }
+}
+
 #pragma mark - 各种类型的播放
 
 - (void)playVap {
@@ -90,6 +105,9 @@ void qg_VAP_Logger_handler(VAPLogLevel level, const char* file, int line, const 
     //单纯播放的接口
     //[mp4View playHWDMp4:resPath];
     //指定素材混合模式，重复播放次数，delegate的接口
+    
+    //注意若素材不含vapc box，则必须用调用如下接口设置enable才可播放
+    //[mp4View enableOldVersion:YES];
     [mp4View playHWDMP4:resPath repeatCount:-1 delegate:self];
 }
 
@@ -103,6 +121,7 @@ void qg_VAP_Logger_handler(VAPLogLevel level, const char* file, int line, const 
     mp4View.hwd_enterBackgroundOP = HWDMP4EBOperationTypePauseAndResume; // ⚠️ 建议设置该选项时对机型进行判断，屏蔽低端机
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onImageviewTap:)];
     [mp4View addGestureRecognizer:tap];
+    [mp4View setMute:YES];
     [mp4View playHWDMP4:mp4Path repeatCount:-1 delegate:self];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -122,6 +141,7 @@ void qg_VAP_Logger_handler(VAPLogLevel level, const char* file, int line, const 
     wrapView.autoDestoryAfterFinish = YES;
     [self.view addSubview:wrapView];
     NSString *resPath = [NSString stringWithFormat:@"%@/Resource/giftId-601d204db3633b319c465457.mp4", [[NSBundle mainBundle] resourcePath]];
+    [wrapView setMute:YES];
     [wrapView playHWDMP4:resPath repeatCount:-1 delegate:self];
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doNothingonImageviewTap:)];
     
@@ -203,11 +223,18 @@ void qg_VAP_Logger_handler(VAPLogLevel level, const char* file, int line, const 
 
 //provide the content for tags, maybe text or url string ...
 - (NSString *)vapWrapview_contentForVapTag:(NSString *)tag resource:(QGVAPSourceInfo *)info {
-    return nil;
+    NSDictionary *extraInfo = @{@"[sImg1]" : @"http://shp.qlogo.cn/pghead/Q3auHgzwzM6GuU0Y6q6sKHzq3MjY1aGibIzR4xrJc1VY/60",
+                                @"[textAnchor]" : @"我是主播名",
+                                @"[textUser]" : @"我是用户名😂😂",};
+    return extraInfo[tag];
 }
 
 //provide image for url from tag content
 - (void)vapWrapView_loadVapImageWithURL:(NSString *)urlStr context:(NSDictionary *)context completion:(VAPImageCompletionBlock)completionBlock {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIImage *image = [UIImage imageNamed:[NSString stringWithFormat:@"%@/Resource/qq.png", [[NSBundle mainBundle] resourcePath]]];
+        completionBlock(image, nil, urlStr);
+    });
 }
 
 @end

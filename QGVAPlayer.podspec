@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "QGVAPlayer"
-  spec.version      = "1.0.12"
+  spec.version      = "1.0.17"
   spec.summary      = "video animation player."
   spec.platform     = :ios, "8.0"
 
@@ -60,8 +60,8 @@ Pod::Spec.new do |spec|
   #  profile URL.
   #
 
-  spec.author             = { "mlzhangyu" => "mlzhangyu@gmail.com" }
-  # Or just: spec.author    = "mlzhangyu"
+  spec.author             = { "tencent" => "tencent@gmail.com" }
+  # Or just: spec.author    = "tencent"
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   #
@@ -96,7 +96,7 @@ Pod::Spec.new do |spec|
   #  Not including the public_header_files will make all headers public.
   #
 
-  spec.source_files = 'iOS/QGVAPlayer/QGVAPlayer/**/*.{h,m}'
+  spec.source_files = 'iOS/QGVAPlayer/QGVAPlayer/**/*.{h,m}', 'iOS/QGVAPlayer/QGVAPlayer/Shaders/QGHWDShaders.metal'
 
   # spec.subspec 'Shaders' do |ss|
   #   ss.source_files = 'iOS/QGVAPlayer/QGVAPlayer/Shaders/**/*.{h,m}'
@@ -121,6 +121,14 @@ Pod::Spec.new do |spec|
   #     end
   # end
 
+  build_metal_script = <<-CMD
+      #Pods目录
+      podsPath=$(pwd)
+      if [[ -f "../../compile_metal.sh" ]]; then
+      sh ../../compile_metal.sh
+      fi
+  CMD
+spec.script_phase = { :name => 'Build Metal', :script => build_metal_script, :shell_path =>'/bin/sh', :execution_position => :before_compile}
 
   # spec.exclude_files = "Classes/Exclude"
 

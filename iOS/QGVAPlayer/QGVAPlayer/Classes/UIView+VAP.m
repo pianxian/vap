@@ -54,9 +54,10 @@ NSInteger const VapMaxCompatibleVersion = 2;
 @property (nonatomic, strong) QGVAPMetalView                *vap_metalView;             //vap格式mp4渲染图层
 @property (nonatomic, assign) BOOL                          hwd_isFinish;               //标记是否结束
 @property (nonatomic, assign) NSInteger                     hwd_repeatCount;            //播放次数；-1 表示无限循环
-@property (nonatomic, strong) QGVAPConfigManager            *hwd_configManager;             //额外的配置信息
-@property (nonatomic, strong) dispatch_queue_t              vap_renderQueue;                //播放队列
-
+@property (nonatomic, strong) QGVAPConfigManager            *hwd_configManager;         //额外的配置信息
+@property (nonatomic, strong) dispatch_queue_t              vap_renderQueue;            //播放队列
+@property (nonatomic, assign) BOOL                          vap_enableOldVersion;       //标记是否兼容不含vapc box的素材播放
+@property (nonatomic, assign) BOOL                          vap_isMute;                 //标记是否禁止音频播放
 @end
 
 @implementation UIView (VAP)
@@ -134,6 +135,7 @@ NSInteger const VapMaxCompatibleVersion = 2;
     if (self.vap_metalView) {
         [self.vap_metalView dispose];
     }
+    [self.hwd_decodeManager tryToStopAudioPlay];
     [self.hwd_callbackQueue addOperationWithBlock:^{
         //此处必须延迟释放，避免野指针
         if ([self.hwd_Delegate respondsToSelector:@selector(viewDidStopPlayMP4:view:)]) {
@@ -338,6 +340,11 @@ NSInteger const VapMaxCompatibleVersion = 2;
         return ;
     }
     
+    if (!configManager.hasValidConfig && !self.vap_enableOldVersion) {
+        VAP_Error(kQGVAPModuleCommon, @"playHWDMP4 error! don't has vapc box and enableOldVersion is false!");
+        [self stopHWDMP4];
+        return ;
+    }
     //reset
     self.hwd_currentFrameInstance = nil;
     self.hwd_decodeManager = nil;
@@ -461,6 +468,7 @@ NSInteger const VapMaxCompatibleVersion = 2;
     
     VAP_Info(kQGVAPModuleCommon, @"pauseHWDMP4");
     self.hwd_onPause = YES;
+    [self.hwd_decodeManager tryToPauseAudioPlay];
 // pause回调stop会导致一般使用场景将view移除，无法resume，因此暂时去掉该回调触发
 //    [self.hwd_callbackQueue addOperationWithBlock:^{
 //        //此处必须延迟释放，避免野指针
@@ -475,12 +483,21 @@ NSInteger const VapMaxCompatibleVersion = 2;
     VAP_Info(kQGVAPModuleCommon, @"resumeHWDMP4");
     self.hwd_onPause = NO;
     self.hwd_openGLView.pause = NO;
+    // 目前音频和视频没有同步逻辑，多次暂停恢复会使音视频差距越来越大
+    [self.hwd_decodeManager tryToResumeAudioPlay];
 }
 
 + (void)registerHWDLog:(QGVAPLoggerFunc)logger {
     [QGVAPLogger registerExternalLog:logger];
 }
 
+- (void)enableOldVersion:(BOOL)enable {
+    self.vap_enableOldVersion = enable;
+}
+
+- (void)setMute:(BOOL)isMute {
+    self.vap_isMute = isMute;
+}
 #pragma mark - delegate
 
 #pragma clang diagnostic push
@@ -488,6 +505,10 @@ NSInteger const VapMaxCompatibleVersion = 2;
 //decoder
 - (Class)decoderClassForManager:(QGAnimatedImageDecodeManager *)manager {
     return [QGMP4FrameHWDecoder class];
+}
+
+- (BOOL)shouldSetupAudioPlayer {
+    return !self.vap_isMute;
 }
 
 - (void)decoderDidFinishDecode:(QGBaseDecoder *)decoder {
@@ -596,7 +617,8 @@ HWDSYNTH_DYNAMIC_PROPERTY_OBJECT(vap_metalView, setVap_metalView, OBJC_ASSOCIATI
 HWDSYNTH_DYNAMIC_PROPERTY_OBJECT(hwd_attachmentsModel, setHwd_attachmentsModel, OBJC_ASSOCIATION_RETAIN)
 HWDSYNTH_DYNAMIC_PROPERTY_OBJECT(hwd_configManager, setHwd_configManager, OBJC_ASSOCIATION_RETAIN)
 HWDSYNTH_DYNAMIC_PROPERTY_OBJECT(vap_renderQueue, setVap_renderQueue, OBJC_ASSOCIATION_RETAIN)
-
+HWDSYNTH_DYNAMIC_PROPERTY_CTYPE(vap_enableOldVersion, setVap_enableOldVersion, BOOL)
+HWDSYNTH_DYNAMIC_PROPERTY_CTYPE(vap_isMute, setVap_isMute, BOOL)
 @end
 
 

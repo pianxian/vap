@@ -30,6 +30,10 @@ function computeCoord(x:number, y:number, w:number, h:number, vw:number, vh:numb
 export default class WebglRenderVap extends VapVideo {
   constructor(options:VapConfig) {
     super(options);
+    if ( this.useFrameCallback ) {
+      // @ts-ignore
+      this.animId = this.video.requestVideoFrameCallback( this.drawFrame.bind(this) );
+    }
     this.insType = this.options.type;
     if (instances[this.insType]) {
       this.instance = instances[this.insType]
@@ -280,6 +284,12 @@ export default class WebglRenderVap extends VapVideo {
   }
 
   drawFrame(_, info) {
+    const timePoint = (info && info.mediaTime >= 0) ? info.mediaTime : this.video.currentTime
+    const frame = Math.round(timePoint * this.options.fps) + this.options.offset;
+    const frameCbs = this.events['frame'] || []
+    frameCbs.forEach(cb => {
+      cb(frame + 1, timePoint)
+    })
     const gl = this.instance.gl;
     if (!gl) {
       super.drawFrame(_, info);
@@ -287,8 +297,6 @@ export default class WebglRenderVap extends VapVideo {
     }
     gl.clear(gl.COLOR_BUFFER_BIT);
     if (this.vapFrameParser) {
-      const timePoint = (info && info.mediaTime >= 0) ? info.mediaTime : this.video.currentTime
-      const frame = Math.round(timePoint * this.options.fps) + this.options.offset;
       const frameData = this.vapFrameParser.getFrame(frame);
       let posArr = [];
 

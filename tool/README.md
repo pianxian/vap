@@ -2,16 +2,16 @@
 
 VapTool Java版本支持 Windows 与Mac
 
-版本: [tool2.0.2](https://github.com/Tencent/vap/releases/tag/tool2.0.2)
+版本: [tool2.0.6](https://github.com/Tencent/vap/releases/tag/tool2.0.6)
 
-os|download|description
----|---|---
-Windows|[VapTool\_Java\_Win\_Full.zip](https://github.com/Tencent/vap/releases/download/tool2.0.2/VapTool_Java_Win_Full.zip)|包含jre 可直接运行
-Mac|[VapTool\_Java\_Mac\_without\_jre.zip](https://github.com/Tencent/vap/releases/download/tool2.0.2/VapTool_Java_Mac_without_jre.zip)|未含jre 但Mac基本自带java 
+
+Windows: [vaptool_win_v2.0.6.zip](https://github.com/Tencent/vap/releases/download/tool2.0.6/vaptool_win_v2.0.6.zip)(包含jre 可直接运行)
+
+Mac: [vaptool_mac_v2.0.6.zip](https://github.com/Tencent/vap/releases/download/tool2.0.6/vaptool_mac_v2.0.6.zip)(未含jre 但Mac基本自带java)
 
 运行包中包含其它工具，可以单独下载jar文件，替换后运行：
 
-download jar: [animtool_tool2.0.2.zip](https://github.com/Tencent/vap/releases/download/tool2.0.2/animtool_tool2.0.2.zip)
+download jar: [animtool_jar_v2.0.6.zip](https://github.com/Tencent/vap/releases/download/tool2.0.6/animtool_jar_v2.0.6.zip)
 
 测试素材下载：[test_demo.zip](https://github.com/Tencent/vap/releases/download/tool2.0.2/test_demo.zip)
 
@@ -47,6 +47,19 @@ chmod +x mac_start.sh
 ./mac_start.sh
 ```
 
+### Mac App版
+
+如果不会使用命令行运行，可以下载Mac App版本：[vaptool_mac_app_v2.0.6.zip](https://github.com/Tencent/vap/releases/download/tool2.0.6/vaptool_mac_app_v2.0.6.zip)
+
+使用方法：
+1. 解压后双击VapToolMac运行
+2. 首次运行需要授权（会弹框提示无法打开）-> 系统偏好设置 -> 安全与隐私 -> 通用tab -> 点击"仍要打开"
+3. 授权后再次打开就能正常运行
+
+ps:建议使用命令行方式，Mac App版有些问题没解决，比如参数保存问题。
+
+
+
 ## 工具说明
 
 ![](images/vaptool_java_01.png)
@@ -56,7 +69,9 @@ chmod +x mac_start.sh
 	* h265: **优点**: 压缩率更高，画面更清晰；**缺点**: Android 4.x 版本无法播放，部分低端机器兼容性差; Web端浏览器可能不支持h265;
 
 * fps: 每秒播放多少帧;
-* bitrate: 设置视频码率，默认2000k，数字越大越清晰，但文件也越大;
+* quality: 清晰度参数选择，提供 bitrate/crf 两个选项 
+	* bitrate(default): 设置视频码率，默认2000k，数字越大越清晰，但文件也越大, 相比crf能更精确控制文件大小;
+	* crf: 画面质量参数，取值范围[0,51] 默认29 (0表示无损压缩，文件会非常大), 对清晰度要求比较高可以控制crf参数，设置一个较小的值能显著提高视频清晰度，但文件大小不好控制（文件会比较大）。
 * alpha scale: 视频alpha区域是否缩放(默认缩放0.5)，目前可选: 缩放0.5;不缩放1. 缩放视频能最终减小视频分辨率，提高兼容性;
 * frames path: 视频帧存放的位置
 	* 视频帧命名方法 **000.png 001.png ... 099.png**。第一帧一定是**000.png**不然无法正常生成，可以参考"simple_demo";

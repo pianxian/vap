@@ -99,12 +99,12 @@ class HardDecoder(player: AnimPlayer) : Decoder(player), SurfaceTexture.OnFrameA
             // 是否支持h265
             if (MediaUtil.checkIsHevc(format)) {
                 if (Build.VERSION.SDK_INT  < Build.VERSION_CODES.LOLLIPOP
-                    || !MediaUtil.isDeviceSupportHevc) {
+                    || !MediaUtil.checkSupportCodec(MediaUtil.MIME_HEVC)) {
 
                     onFailed(Constant.REPORT_ERROR_TYPE_HEVC_NOT_SUPPORT,
                         "${Constant.ERROR_MSG_HEVC_NOT_SUPPORT} " +
                                 "sdk:${Build.VERSION.SDK_INT}" +
-                                ",support hevc:" + MediaUtil.isDeviceSupportHevc)
+                                ",support hevc:" + MediaUtil.checkSupportCodec(MediaUtil.MIME_HEVC))
                     release(null, null)
                     return
                 }
@@ -120,7 +120,7 @@ class HardDecoder(player: AnimPlayer) : Decoder(player), SurfaceTexture.OnFrameA
             // 由于使用mediacodec解码老版本素材时对宽度1500尺寸的视频进行数据对齐，解码后的宽度变成1504，导致采样点出现偏差播放异常
             // 所以当开启兼容老版本视频模式并且老版本视频的宽度不能被16整除时要走YUV渲染逻辑
             // 但是这样直接判断有风险，后期想办法改
-            needYUV = !(videoWidth % 16 == 0) && player.enableVersion1
+            needYUV = videoWidth % 16 != 0 && player.enableVersion1
 
             try {
                 if (!prepareRender(needYUV)) {
@@ -188,6 +188,7 @@ class HardDecoder(player: AnimPlayer) : Decoder(player), SurfaceTexture.OnFrameA
         var outputDone = false
         var inputDone = false
         var frameIndex = 0
+        var isLoop = false
 
         val decoderInputBuffers = decoder.inputBuffers
 
@@ -227,9 +228,16 @@ class HardDecoder(player: AnimPlayer) : Decoder(player), SurfaceTexture.OnFrameA
                     decoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
                         outputFormat = decoder.outputFormat
                         outputFormat?.apply {
-                            if (this.getInteger(MediaFormat.KEY_STRIDE) > 0 && this.getInteger(MediaFormat.KEY_SLICE_HEIGHT) > 0) {
-                                alignWidth = this.getInteger(MediaFormat.KEY_STRIDE)
-                                alignHeight = this.getInteger(MediaFormat.KEY_SLICE_HEIGHT)
+                            try {
+                                // 有可能取到空值，做一层保护
+                                val stride = getInteger("stride")
+                                val sliceHeight = getInteger("slice-height")
+                                if (stride > 0 && sliceHeight > 0) {
+                                    alignWidth = stride
+                                    alignHeight = sliceHeight
+                                }
+                            } catch (t: Throwable) {
+                                ALog.e(TAG, "$t", t)
                             }
                         }
                         ALog.i(TAG, "decoder output format changed: $outputFormat")
@@ -256,7 +264,7 @@ class HardDecoder(player: AnimPlayer) : Decoder(player), SurfaceTexture.OnFrameA
                         // release & render
                         decoder.releaseOutputBuffer(decoderStatus, doRender && !needYUV)
 
-                        if (frameIndex == 0) {
+                        if (frameIndex == 0 && !isLoop) {
                             onVideoStart()
                         }
                         player.pluginManager.onDecoding(frameIndex)
@@ -266,11 +274,13 @@ class HardDecoder(player: AnimPlayer) : Decoder(player), SurfaceTexture.OnFrameA
                         ALog.d(TAG, "decode frameIndex=$frameIndex")
                         if (loop > 0) {
                             ALog.d(TAG, "Reached EOD, looping")
+                            player.pluginManager.onLoopStart()
                             extractor.seekTo(0, MediaExtractor.SEEK_TO_CLOSEST_SYNC)
                             inputDone = false
                             decoder.flush()
                             speedControlUtil.reset()
-                            frameIndex = 1
+                            frameIndex = 0
+                            isLoop = true
                         }
                         if (outputDone) {
                             release(decoder, extractor)
@@ -362,8 +372,8 @@ class HardDecoder(player: AnimPlayer) : Decoder(player), SurfaceTexture.OnFrameA
     }
 
     override fun destroy() {
-        needDestroy = true
         if (isRunning) {
+            needDestroy = true
             stop()
         } else {
             destroyInner()
@@ -371,6 +381,7 @@ class HardDecoder(player: AnimPlayer) : Decoder(player), SurfaceTexture.OnFrameA
     }
 
     private fun destroyInner() {
+        ALog.i(TAG, "destroyInner")
         renderThread.handler?.post {
             player.pluginManager.onDestroy()
             render?.destroyRender()
