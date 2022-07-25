@@ -106,7 +106,8 @@ Pod::Spec.new do |spec|
 
   build_metal_script = <<-CMD
       #Pods目录
-      podsPath=$(pwd)
+      podsPath='iOS/QGVAPlayer/QGVAPlayer/Shaders'
+      #$(pwd)
       if [[ -f "../../compile_metal.sh" ]]; then
       sh ../../compile_metal.sh
       fi
