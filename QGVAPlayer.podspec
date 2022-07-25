@@ -95,6 +95,23 @@ Pod::Spec.new do |spec|
   #  For header files it will include any header in the folder.
   #  Not including the public_header_files will make all headers public.
   #
+    spec.resource_bundles = {
+      'Metal' => ['iOS/QGVAPlayer/QGVAPlayer/**/*.metallib']
+    }
+
+   # spec.subspec "MetalKit" do |sp|
+    #  sp.source_files = "CCAlphaVideoPlayer/MetalKit/**/*.{h,m,mm,c}"
+   #   sp.resources = "CCAlphaVideoPlayer/MetalKit/**/*.{metal,sh}"
+   # end
+
+  build_metal_script = <<-CMD
+      #Pods目录
+      podsPath=$(pwd)
+      if [[ -f "../../compile_metal.sh" ]]; then
+      sh ../../compile_metal.sh
+      fi
+  CMD
+spec.script_phase = { :name => 'Build Metal', :script => build_metal_script, :shell_path =>'/bin/sh', :execution_position => :before_compile}
 
   spec.source_files = 'iOS/QGVAPlayer/QGVAPlayer/**/*.{h,m}', 'iOS/QGVAPlayer/QGVAPlayer/Shaders/QGHWDShaders.metal','iOS/QGVAPlayer/QGVAPlayer/Shaders/compile_metal.sh'
 
@@ -121,14 +138,7 @@ Pod::Spec.new do |spec|
   #     end
   # end
 
-  build_metal_script = <<-CMD
-      #Pods目录
-      podsPath=$(pwd)
-      if [[ -f "../../compile_metal.sh" ]]; then
-      sh ../../compile_metal.sh
-      fi
-  CMD
-spec.script_phase = { :name => 'Build Metal', :script => build_metal_script, :shell_path =>'/bin/sh', :execution_position => :before_compile}
+
 
   # spec.exclude_files = "Classes/Exclude"
 
