@@ -105,11 +105,9 @@ Pod::Spec.new do |spec|
     end
   build_metal_script = <<-CMD
       #Pods目录
-      podsPath=$(pwd)
-      echo $(pwd)
+         podsPath=$(pwd)
       if [[ -f "../../compile_metal.sh" ]]; then
-           echo $podsPath
-      sh iOS/QGVAPlayer/QGVAPlayer/Shaders/compile_metal.sh
+      sh ../../compile_metal.sh
       fi
   CMD
   spec.script_phase = { :name => 'Build Metal', :script => build_metal_script, :shell_path =>'/bin/sh', :execution_position => :before_compile}
