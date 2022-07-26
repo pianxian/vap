@@ -98,11 +98,13 @@ Pod::Spec.new do |spec|
   #
 
 
+    spec.resource_bundles = {
+      'Metal' => ['iOS/QGVAPlayer/QGVAPlayer/**/*.metallib']
+    }
 
-    spec.subspec "QGVAPlayer" do |sp|
-      sp.source_files = 'iOS/QGVAPlayer/QGVAPlayer/**/*.{h,m,mm,c}'
-      sp.resources = 'iOS/QGVAPlayer/QGVAPlayer/**/*.{metal,sh}"
-    end
+  spec.source_files = 'iOS/QGVAPlayer/QGVAPlayer/**/*.{h,m,mm,c}'
+  spec.resources = 'iOS/QGVAPlayer/QGVAPlayer/**/*.{metal,sh}"
+  
   build_metal_script = <<-CMD
       #Pods目录
          podsPath=$(pwd)
@@ -113,9 +115,6 @@ Pod::Spec.new do |spec|
   spec.script_phase = { :name => 'Build Metal', :script => build_metal_script, :shell_path =>'/bin/sh', :execution_position => :before_compile}
 
 
-        spec.resource_bundles = {
-      'Metal' => ['iOS/QGVAPlayer/QGVAPlayer/**/*.metallib']
-    }
 
   #spec.source_files = 'iOS/QGVAPlayer/QGVAPlayer/**/*.{h,m}'
 #'iOS/QGVAPlayer/QGVAPlayer/Shaders/QGHWDShaders.metal'
