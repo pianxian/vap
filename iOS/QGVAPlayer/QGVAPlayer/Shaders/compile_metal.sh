@@ -35,7 +35,7 @@ for (( i = 0; i < index; i++ )); do
     remove_command+=" "
 done
 
-bulid_command+="-o alpha_video_renderer.metallib"
+bulid_command+="-o QGHWDShaders.metallib"
 $bulid_command
 $remove_command
 
