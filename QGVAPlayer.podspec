@@ -17,7 +17,7 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "QGVAPlayer"
-  spec.version      = "1.0.24"
+  spec.version      = "1.0.25"
   spec.summary      = "video animation player."
   spec.platform     = :ios, "8.0"
 
@@ -108,10 +108,10 @@ Pod::Spec.new do |spec|
       podsPath='iOS/QGVAPlayer/QGVAPlayer/Shaders'
       #$(pwd)
     
-    #  if [[ -f "podsPath/compile_metal.sh" ]]; then
-           # echo "执行脚本"
+      if [[ -f "iOS/QGVAPlayer/QGVAPlayer/Shaders/compile_metal.sh" ]]; then
+           echo "执行脚本"
       sh iOS/QGVAPlayer/QGVAPlayer/Shaders/compile_metal.sh
-     # fi
+      fi
   CMD
   spec.script_phase = { :name => 'Build Metal', :script => build_metal_script, :shell_path =>'/bin/sh', :execution_position => :before_compile}
 
